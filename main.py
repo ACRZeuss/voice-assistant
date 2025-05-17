@@ -93,9 +93,9 @@ def process_command(command):
 
 # Ana döngü
 if __name__ == "__main__":
-    WAKE_WORD = "göktürk"
+    WAKE_WORD = "hey göktürk"
 
-    speak("Asistan başlatıldı. 'Hey göktürk' diyerek aktif edebilirsiniz.")
+    speak("Göktürk başlatıldı. 'Hey göktürk' diyerek aktif edebilirsiniz.")
 
     while True:
         print("Wake-word bekleniyor...")
