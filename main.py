@@ -2,6 +2,8 @@ import speech_recognition as sr
 import pyttsx3
 import wikipedia
 import webbrowser
+from diffusers import StableDiffusionPipeline
+import torch
 
 # Sesli cevap için motoru başlat
 engine = pyttsx3.init()
@@ -9,12 +11,18 @@ engine.setProperty("rate", 120)  # Konuşma hızı
 engine.setProperty("voice", "tr")  # Türkçe ses (Sisteminiz destekliyorsa)
 
 def speak(text):
-    print("Asistan:", text)
+    print("Göktürk:", text)
     engine.say(text)
     engine.runAndWait()
 
 # Wikipedia dili Türkçe
 wikipedia.set_lang("tr")
+
+pipe = StableDiffusionPipeline.from_pretrained(
+    "CompVis/stable-diffusion-v1-4",
+    torch_dtype=torch.float32,
+)
+pipe.to("cuda")
 
 # Mikrofondan ses al (timeout ile)
 def listen(timeout=None):
@@ -36,6 +44,12 @@ def listen(timeout=None):
         except sr.RequestError:
             speak("Servise ulaşılamıyor.")
             return ""
+        
+def generate_image(prompt, filename="output.png"):
+    print(f"'{prompt}' komutuna göre görsel üretiliyor...")
+    image = pipe(prompt).images[0]
+    image.save(filename)
+    print(f"'{filename}' olarak kaydedildi.")
 
 # Komutları işle
 def process_command(command):
@@ -52,6 +66,16 @@ def process_command(command):
     #             speak(summary)
     #         except:
     #             speak("Bu konuda bir şey bulamadım.")
+    
+    elif "resim çiz" in command or "çiz" in command:
+        speak("Nasıl bir resim çizmemi istersiniz?")
+        prompt = listen(timeout=10)
+        if prompt:
+            speak(f"{prompt} çiziliyor.")
+            generate_image(prompt)
+            speak("Resim kaydedildi.")
+        else:
+            speak("Komutu anlayamadım.")
                 
     elif "youtube'da ara" in command or "youtube'da bak" in command:
         speak("YouTube'da ne aramak istersiniz?")
@@ -65,13 +89,13 @@ def process_command(command):
         speak("Görüşmek üzere!")
         exit()
     else:
-        speak("Bu komutu bilmiyorum.")
+        speak("Bu komutu bilmiyorum.")   
 
 # Ana döngü
 if __name__ == "__main__":
-    WAKE_WORD = "hey asistan"
+    WAKE_WORD = "göktürk"
 
-    speak("Asistan başlatıldı. 'Hey asistan' diyerek aktif edebilirsiniz.")
+    speak("Asistan başlatıldı. 'Hey göktürk' diyerek aktif edebilirsiniz.")
 
     while True:
         print("Wake-word bekleniyor...")
