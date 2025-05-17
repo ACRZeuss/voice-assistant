@@ -1,0 +1,1 @@
+Gerekli Pytorch komutu (cuda 12.8 için): pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128

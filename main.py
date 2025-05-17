@@ -22,7 +22,7 @@ pipe = StableDiffusionPipeline.from_pretrained(
     "CompVis/stable-diffusion-v1-4",
     torch_dtype=torch.float32,
 )
-pipe.to("cuda")
+pipe.to("cuda") # GPU kullanımı için "cuda" veya CPU için "cpu" yazabilirsiniz.
 
 # Mikrofondan ses al (timeout ile)
 def listen(timeout=None):
