@@ -93,7 +93,7 @@ def process_command(command):
 
 # Ana döngü
 if __name__ == "__main__":
-    WAKE_WORD = "hey göktürk"
+    WAKE_WORD = "göktürk"
 
     speak("Göktürk başlatıldı. 'Hey göktürk' diyerek aktif edebilirsiniz.")
 
