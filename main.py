@@ -1,13 +1,14 @@
+from diffusers import StableDiffusionPipeline
+from deep_translator import GoogleTranslator
 import speech_recognition as sr
 import pyttsx3
 import wikipedia
 import webbrowser
-from diffusers import StableDiffusionPipeline
 import torch
 
 # Sesli cevap için motoru başlat
 engine = pyttsx3.init()
-engine.setProperty("rate", 120)  # Konuşma hızı
+engine.setProperty("rate", 150)  # Konuşma hızı
 engine.setProperty("voice", "tr")  # Türkçe ses (Sisteminiz destekliyorsa)
 
 def speak(text):
@@ -47,7 +48,16 @@ def listen(timeout=None):
         
 def generate_image(prompt, filename="output.png"):
     print(f"'{prompt}' komutuna göre görsel üretiliyor...")
-    image = pipe(prompt).images[0]
+
+    try:
+        translated_prompt = GoogleTranslator(source='tr', target='en').translate(prompt)
+        print(f"İngilizce prompt: {translated_prompt}")
+    except Exception as e:
+        speak("Prompt İngilizceye çevrilemedi.")
+        print("Çeviri hatası:", e)
+        return
+
+    image = pipe(translated_prompt).images[0]
     image.save(filename)
     print(f"'{filename}' olarak kaydedildi.")
 
@@ -67,9 +77,9 @@ def process_command(command):
     #         except:
     #             speak("Bu konuda bir şey bulamadım.")
     
-    elif "resim çiz" in command or "çiz" in command:
+    elif "resim" in command or "çiz" in command:
         speak("Nasıl bir resim çizmemi istersiniz?")
-        prompt = listen(timeout=10)
+        prompt = listen(timeout=20)
         if prompt:
             speak(f"{prompt} çiziliyor.")
             generate_image(prompt)
@@ -79,7 +89,7 @@ def process_command(command):
                 
     elif "youtube'da ara" in command or "youtube'da bak" in command:
         speak("YouTube'da ne aramak istersiniz?")
-        query = listen(timeout=10)
+        query = listen(timeout=20)
         if query:
             url = f"https://www.youtube.com/results?search_query={query.replace(' ', '+')}"
             speak(f"YouTube'da {query} için sonuçlar getiriliyor.")
